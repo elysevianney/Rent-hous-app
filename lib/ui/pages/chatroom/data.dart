@@ -6,36 +6,29 @@ class Data {
   static final messageList = [
     Message(
       id: '1',
-      message: "Hi!",
+      message: "Salut je suis intéressé",
       createdAt: DateTime.now(),
       sendBy: '1', // userId of who sends the message
       status: MessageStatus.read,
     ),Message(
       id: '2',
-      message: "Oui Vianney, c'est comment?",
+      message: "Oui, salut. J'èspere que vous allez bien. Pouvez vous présenter?",
       createdAt: DateTime.now(),
       sendBy: '2', // userId of who sends the message
       status: MessageStatus.read,
     ),
     Message(
       id: '3',
-      message: "Je vais pas bien",
+      message: "Je m'appelle Anaëlle, je suis nouvelle étudiante et je recherche un appartement pour être plus proche de mon université et je pense que votre offre m'intéresse",
       createdAt: DateTime.now(),
       sendBy: '1', // userId of who sends the message
       status: MessageStatus.read,
     ),
     Message(
       id: '4',
-      message: "Dis bb chou, tu veux qoui",
+      message: "D'accord. Je pense qu'on peut se voit un de ses jours pour que je vous montre l'endroit.",
       createdAt: DateTime.now(),
       sendBy: '2', // userId of who sends the message
-      status: MessageStatus.read,
-    ),
-    Message(
-      id: '5',
-      message: "Attend je viens",
-      createdAt: DateTime.now(),
-      sendBy: '1', // userId of who sends the message
       status: MessageStatus.read,
     ),
     /*Message(

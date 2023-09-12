@@ -1,8 +1,10 @@
 import 'dart:async';
 
 
+import 'package:location_app/core/controllers/auth/post_controller.dart';
 import 'package:location_app/export.dart';
 
+import '../../../core/models/post.dart';
 import '../../../core/provider/bottomNavigation/navigator_provider.dart';
 
 class Home extends StatefulWidget {
@@ -13,35 +15,21 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
   final GlobalKey<ScaffoldState> _key = GlobalKey();
+  @override
+
+
   @override
   Widget build(BuildContext context) {
     DashboardProvider returnHome = Provider.of<DashboardProvider>(context);
+    final post_controller = Provider.of<PostController>(context);
+
+
+
     return Scaffold(
       key: _key,
       drawer: MyDrawer(key2: _key,),
-      /*appBar: AppBar(
-        backgroundColor: AppColors.primaryTwo,
-        leading: InkWell(
-          highlightColor: AppColors.primaryTwo,
-          onTap: (){
-            _key.currentState?.openDrawer();
-           // Scaffold.of(context).openDrawer();
-          },
-          child: const Icon(
-            Icons.menu,
-            color: AppColors.white,
-            size: 25,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: SvgPicture.asset($AppAssets.svgs.person_circle)
-            //Icon(Icons.person_rounded, color: AppColors.white, size: 25,),
-          )
-        ],
-      ),*/
       body: NestedScrollView(
         //floatHeaderSlivers: true,
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
@@ -76,7 +64,71 @@ class _HomeState extends State<Home> {
             )
           ] ;
         },
-        body: ListView(
+        body:
+        ListView(
+          children: [
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text('Découvrez les meilleurs\nappartements selon vos critères',
+                    softWrap: true,
+                    style: AppTypography().welcome2,
+                  ),
+                ),
+                const SizedBox(height: 20,),
+                FutureBuilder<List<Annonce>?>(
+                  future: post_controller.getAnnonce(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Annonce>?> snapshot) {
+                    print(post_controller.getAnnonce());
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else if (!snapshot.hasData || snapshot.data == null) {
+                      return const Text('Aucun pack disponible');
+                    } else {
+
+                      return ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: snapshot.data?.length,
+                        itemBuilder: (context, index) {
+                          List<String> imgP = [];
+                          for(int i = 0; i< snapshot.data!.elementAt(index).image.length; i++){
+
+                            imgP.add(snapshot.data!.elementAt(index).image.elementAt(i).url);
+                          }
+                          Annonce element = snapshot.data!.elementAt(index);
+                          return Annoncesss(
+                              id: element.id,
+                              username: '${snapshot.data!.elementAt(index).user.firstName} ${snapshot.data!.elementAt(0).user.lastName}',
+                              imagePath: imgP,
+                              price: element.prix, ville: element.ville,
+                              quartier: element.quatier,
+                              nbChambre: element.nbreChambre,
+                              nbPersonne: element.nbrePersonne,
+                              nbDouche: element.nbreDouche,
+                              userProfilPath: $AppAssets.imgs.profil,
+
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+
+
+
+              ],
+            )
+
+          ],
+        )
+        /*ListView(
           children: [
             Column(
               children: [
@@ -100,7 +152,7 @@ class _HomeState extends State<Home> {
               ],
             )
           ],
-        ),
+        ),*/
 
       ),
 
@@ -108,7 +160,8 @@ class _HomeState extends State<Home> {
   }
 }
 
-class Annonce extends StatelessWidget {
+class Annoncesss extends StatelessWidget {
+  final String id;
   final String username;
   final String userProfilPath;
   final List<String> imagePath;
@@ -118,8 +171,8 @@ class Annonce extends StatelessWidget {
   final int nbChambre;
   final int nbPersonne;
   final int nbDouche;
-  const Annonce({
-    super.key, required this.username, required this.imagePath, required this.price, required this.ville, required this.quartier, required this.nbChambre, required this.nbPersonne, required this.nbDouche, required this.userProfilPath,
+  const Annoncesss({
+    super.key, required this.id, required this.username, required this.imagePath, required this.price, required this.ville, required this.quartier, required this.nbChambre, required this.nbPersonne, required this.nbDouche, required this.userProfilPath,
   });
 
   @override
@@ -165,7 +218,7 @@ class Annonce extends StatelessWidget {
               const SizedBox(height: 12,),
               GestureDetector(
                 onTap: (){
-                  context.push('${AppPage.detailPost.toPath}/$username');
+                  context.push('${AppPage.detailPost.toPath}/$id');
                 },
                 child: ImageSlider(prix: '$price',
                   imagesPath: imagePath,
@@ -270,40 +323,46 @@ class MySearchDelegate extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     // TODO: implement buildSuggestions
-    List<Annonce> searchResults = [
+    List<Annoncesss> searchResults = [
 
-      Annonce(username: 'Vianney AHM',
-          imagePath: [$AppAssets.imgs.maison,
-            $AppAssets.imgs.maison,
-            $AppAssets.imgs.maison,],
-          price: 8500, ville: 'Cotonou', quartier: 'Agla', nbChambre: 2, nbPersonne: 4, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil
+      Annoncesss(username: 'Audrey LALI',
+          imagePath: [$AppAssets.imgs.appart2_1,
+            $AppAssets.imgs.appart2_2,
+            $AppAssets.imgs.appart2_3,],
+          price: 10000, ville: 'Calavi', quartier: 'Zogbadje', nbChambre: 1, nbPersonne: 1, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil, id: '1',
+
       ),
-      Annonce(username: 'Audrey LALI',
-          imagePath: [$AppAssets.imgs.maison,
-            $AppAssets.imgs.maison,
-            $AppAssets.imgs.maison,],
-          price: 1000, ville: 'Calavi', quartier: 'Zogbadje', nbChambre: 2, nbPersonne: 23, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil
+      Annoncesss(username: 'Anaelle',
+          imagePath: [$AppAssets.imgs.appart3_1,
+            $AppAssets.imgs.appart3_2,
+            $AppAssets.imgs.appart3_3,],
+          price: 20000, ville: 'Porto-Novo', quartier: 'Agla', nbChambre: 2, nbPersonne: 4, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil, id: '2',
+
       ),
-      Annonce(username: 'Anaelle',
-          imagePath: [$AppAssets.imgs.maison,
-            $AppAssets.imgs.maison,
-            $AppAssets.imgs.maison,],
-          price: 20000, ville: 'Porto-Novo', quartier: 'Agla', nbChambre: 2, nbPersonne: 4, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil
+      Annoncesss(username: 'Vianney AHM',
+        imagePath: [$AppAssets.imgs.appart1_1,
+          $AppAssets.imgs.appart1_2,
+          $AppAssets.imgs.appart1_3,],
+        price: 8500, ville: 'Cotonou', quartier: 'Agla', nbChambre: 2, nbPersonne: 4, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil, id: '3',
+
+
       ),
-      Annonce(username: 'Celsia',
+      Annoncesss(username: 'Celsia',
           imagePath: [$AppAssets.imgs.maison,
             $AppAssets.imgs.maison,
             $AppAssets.imgs.maison,],
-          price: 6500, ville: 'Calavi', quartier: 'Iita', nbChambre: 2, nbPersonne: 4, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil
+          price: 6500, ville: 'Calavi', quartier: 'Iita', nbChambre: 2, nbPersonne: 2, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil, id: '4',
+
       ),
-      Annonce(username: 'Vianney AHM',
+      Annoncesss(username: 'Fridaous H',
           imagePath: [$AppAssets.imgs.maison,
             $AppAssets.imgs.maison,
             $AppAssets.imgs.maison,],
-          price: 8500, ville: 'Cotonou', quartier: 'Agla', nbChambre: 2, nbPersonne: 4, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil
+          price: 8500, ville: 'Cotonou', quartier: 'Agla', nbChambre: 1, nbPersonne: 4, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil, id: '5',
+
       ),
     ];
-    List<Annonce> suggestions = searchResults.where((searchResult) {
+    List<Annoncesss> suggestions = searchResults.where((searchResult) {
       final result = searchResult.ville.toLowerCase() + searchResult.quartier.toLowerCase();
       final input = query.toLowerCase();
       return result.contains(input);
@@ -412,7 +471,7 @@ class _ImageSliderState extends State<ImageSlider> {
   final List<String> imagesPath ;
 
   _ImageSliderState(this.prix, this.imagesPath);
-  final List<AssetImage> _pages = [
+  final List<NetworkImage> _pages = [
   ];
 
 
@@ -422,37 +481,14 @@ class _ImageSliderState extends State<ImageSlider> {
   void initState() {
     for(int i = 0; i < imagesPath.length; i++){
       _pages.add(
-          AssetImage(imagesPath.elementAt(i))
+          NetworkImage(imagesPath.elementAt(i))
       );
     }
 
-    /*if(_activePage == 0){
-      Timer(Duration(seconds: 4), () {
-        if(_pageController.hasClients) _pageController.animateToPage(1, duration: Duration(seconds: 1), curve: Curves.easeInOut);
-      });
-    }
-    super.initState();*/
+
   }
 
-  /*
-  @override
-  void setState(VoidCallback fn) {
-    // TODO: implement setState
-    super.setState(fn);
-    for(int i = 0; i < _pages.length; i++){
-      if(_activePage == _pages.length-1){
-        Timer(Duration(seconds: 4), () {
-          if(_pageController.hasClients) _pageController.jumpToPage(0);
-        });
-      }else{
-        Timer(Duration(seconds: 4), () {
-          if(_pageController.hasClients) _pageController.nextPage(duration: Duration(seconds: 1), curve: Curves.easeInOut);
 
-        });
-      }
-    }
-
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -475,7 +511,9 @@ class _ImageSliderState extends State<ImageSlider> {
                   return Container(
                     height: 260,
                     decoration: BoxDecoration(
-                        image: DecorationImage(image: _pages[index % _pages.length], fit: BoxFit.cover)
+                        image: DecorationImage(
+                            image: _pages[index % _pages.length],
+                            fit: BoxFit.cover)
                     ),
                     child: const SizedBox(),
                   );
@@ -493,7 +531,7 @@ class _ImageSliderState extends State<ImageSlider> {
                     borderRadius: BorderRadius.only(topRight: Radius.circular(6), bottomLeft: Radius.circular(6))
                 ),
                 child: Center(
-                    child: Text(prix,
+                    child: Text('${prix}F',
                       style: AppTypography().title.copyWith(
                         fontSize: 14,
                         color: AppColors.white
@@ -555,42 +593,43 @@ class HouseContent extends StatelessWidget {
     );
   }
 }
-List<Annonce> allAnnonces = [
+List<Annoncesss> allAnnonces = [
 
-  Annonce(username: 'Vianney AHM',
-    imagePath: [$AppAssets.imgs.maison,
-      $AppAssets.imgs.maison,
-      $AppAssets.imgs.maison,],
-    price: 8500, ville: 'Cotonou', quartier: 'Agla', nbChambre: 2, nbPersonne: 4, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil,
+
+  Annoncesss(username: 'Audrey LALI',
+    imagePath: [$AppAssets.imgs.appart2_1,
+      $AppAssets.imgs.appart2_2,
+      $AppAssets.imgs.appart2_3,],
+    price: 1000, ville: 'Calavi', quartier: 'Zogbadje', nbChambre: 1, nbPersonne: 1, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil, id: '1',
+
+  ),
+  Annoncesss(username: 'Anaelle',
+      imagePath: [$AppAssets.imgs.appart3_1,
+      $AppAssets.imgs.appart3_2,
+      $AppAssets.imgs.appart3_3,],
+    price: 20000, ville: 'Porto-Novo', quartier: 'Agla', nbChambre: 2, nbPersonne: 4, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil, id: '2',
+
+  ),
+  Annoncesss(username: 'Vianney AHM',
+    imagePath: [$AppAssets.imgs.appart1_1,
+      $AppAssets.imgs.appart1_2,
+      $AppAssets.imgs.appart1_3,],
+    price: 8500, ville: 'Cotonou', quartier: 'Agla', nbChambre: 2, nbPersonne: 4, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil, id: '3',
 
 
   ),
-  Annonce(username: 'Audrey LALI',
+  Annoncesss(username: 'Celsia',
     imagePath: [$AppAssets.imgs.maison,
       $AppAssets.imgs.maison,
       $AppAssets.imgs.maison,],
-    price: 1000, ville: 'Calavi', quartier: 'Zogbadje', nbChambre: 2, nbPersonne: 23, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil
+    price: 6500, ville: 'Calavi', quartier: 'Iita', nbChambre: 2, nbPersonne: 2, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil, id: '4',
 
   ),
-  Annonce(username: 'Anaelle',
+  Annoncesss(username: 'Fridaous H',
     imagePath: [$AppAssets.imgs.maison,
       $AppAssets.imgs.maison,
       $AppAssets.imgs.maison,],
-    price: 20000, ville: 'Porto-Novo', quartier: 'Agla', nbChambre: 2, nbPersonne: 4, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil
-
-  ),
-  Annonce(username: 'Celsia',
-    imagePath: [$AppAssets.imgs.maison,
-      $AppAssets.imgs.maison,
-      $AppAssets.imgs.maison,],
-    price: 6500, ville: 'Calavi', quartier: 'Iita', nbChambre: 2, nbPersonne: 4, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil
-
-  ),
-  Annonce(username: 'Vianney AHM',
-    imagePath: [$AppAssets.imgs.maison,
-      $AppAssets.imgs.maison,
-      $AppAssets.imgs.maison,],
-    price: 8500, ville: 'Cotonou', quartier: 'Agla', nbChambre: 2, nbPersonne: 4, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil
+    price: 8500, ville: 'Cotonou', quartier: 'Agla', nbChambre: 1, nbPersonne: 4, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil, id: '5',
 
   ),
 ];

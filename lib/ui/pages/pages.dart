@@ -8,3 +8,4 @@ export 'newPost/NewPost.dart';
 export 'detailPost/detailPost.dart';
 export 'myChat/myChat.dart';
 export 'chatroom/chatRoom.dart';
+//export 'detailPostOfUser/detailPostOfUser.dart';

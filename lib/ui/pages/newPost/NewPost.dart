@@ -1,8 +1,10 @@
 
 import 'dart:io';
 import 'dart:async';
+import 'package:location_app/core/controllers/auth/post_controller.dart';
+import 'package:location_app/core/provider/validator/create_post_provider.dart';
 import 'package:location_app/export.dart';
-import 'package:image_picker/image_picker.dart';
+
 import '../../../core/provider/bottomNavigation/navigator_provider.dart';
 
 class NewPost extends StatefulWidget {
@@ -15,6 +17,8 @@ class NewPost extends StatefulWidget {
 class _NewPostState extends State<NewPost> {
 
   //FORM CONTROLLER
+  GlobalKey<FormState> infoFormKey = GlobalKey<FormState>();
+
   TextEditingController villeController = TextEditingController();
   TextEditingController quartierController = TextEditingController();
   TextEditingController nbrChambre = TextEditingController();
@@ -43,7 +47,10 @@ class _NewPostState extends State<NewPost> {
 
   @override
   Widget build(BuildContext context) {
+
+    final provider = Provider.of<PostValidator>(context);
     DashboardProvider returnHome = Provider.of<DashboardProvider>(context);
+
     return Scaffold(
       body: NestedScrollView(
         floatHeaderSlivers: true,
@@ -81,13 +88,12 @@ class _NewPostState extends State<NewPost> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Form(
+                key: infoFormKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-
                       crossAxisAlignment: CrossAxisAlignment.start,
-
                       children: [
                         InkWell(
                           child: Container(
@@ -176,7 +182,7 @@ class _NewPostState extends State<NewPost> {
                       children: [
                         const Icon(Icons.location_pin, size: 20, color: AppColors.primaryTwo,),
                         const SizedBox(width: 12,),
-                        Text('Emplacement de l\'apparetement',
+                        Text('Emplacement de l\'appartement',
                           style: AppTypography().formTitle,
                         ),
                       ],
@@ -189,6 +195,7 @@ class _NewPostState extends State<NewPost> {
                           .copyWith(fontWeight: FontWeight.w400),
                       keyboardType: TextInputType.text,
                       decoration: InputDecoration(
+                        errorStyle: TextStyle(color: AppColors.red),
                           border: const OutlineInputBorder(),
                           hintText: "Entrer la ville",
                           label: Text(
@@ -198,8 +205,12 @@ class _NewPostState extends State<NewPost> {
                                 .copyWith(fontWeight: FontWeight.w400),
                           )),
                       onChanged: (value) {
-
+                        provider.setVille(value);
                       },
+                      validator: (value){
+                        if(value!.isEmpty){
+                        return provider.validateVille(ville: value);}
+                      }
                     ),
                     const SizedBox(height: 12,),
                     TextFormField(
@@ -217,9 +228,13 @@ class _NewPostState extends State<NewPost> {
                                 .headline1
                                 .copyWith(fontWeight: FontWeight.w400),
                           )),
-                      onChanged: (value) {
-
-                      },
+                        onChanged: (value) {
+                          provider.setQuartier(value);
+                        },
+                        validator: (value){
+                          if(value!.isEmpty){
+                            return provider.validateQuartier(quartier: value);}
+                        }
                     ),
                     const SizedBox(height: 16,),
                     Divider(thickness: 1, color: AppColors.hintColor.withOpacity(0.4)),
@@ -250,9 +265,13 @@ class _NewPostState extends State<NewPost> {
                                 .headline1
                                 .copyWith(fontWeight: FontWeight.w400),
                           )),
-                      onChanged: (value) {
-
-                      },
+                        onChanged: (value) {
+                          provider.setNbrPersonnes(value);
+                        },
+                        validator: (value){
+                          if(value!.isEmpty){
+                            return provider.validateNbrPersonnes(nbrPersonnes: value);}
+                        }
                     ),
                     const SizedBox(height: 12,),
                     TextFormField(
@@ -271,9 +290,13 @@ class _NewPostState extends State<NewPost> {
                                 .headline1
                                 .copyWith(fontWeight: FontWeight.w400),
                           )),
-                      onChanged: (value) {
-
-                      },
+                        onChanged: (value) {
+                          provider.setNbrChambres(value);
+                        },
+                        validator: (value){
+                          if(value!.isEmpty){
+                            return provider.validateNbrChambres(nbrChambres: value);}
+                        }
                     ),
                     const SizedBox(height: 12,),
                     TextFormField(
@@ -292,16 +315,20 @@ class _NewPostState extends State<NewPost> {
                                 .headline1
                                 .copyWith(fontWeight: FontWeight.w400),
                           )),
-                      onChanged: (value) {
-
-                      },
+                        onChanged: (value) {
+                          provider.setNbrDouche(value);
+                        },
+                        validator: (value){
+                          if(value!.isEmpty){
+                            return provider.validateNbrDouches(nbrDouches: value);}
+                        }
                     ),
                     const SizedBox(height: 16,),
                     Row(
                       children: [
                         SvgPicture.asset($AppAssets.svgs.price),
                         const SizedBox(width: 12,),
-                        Text('Price',
+                        Text('Prix',
                           style: AppTypography().formTitle,
                         ),
                       ],
@@ -325,9 +352,13 @@ class _NewPostState extends State<NewPost> {
                                 .headline1
                                 .copyWith(fontWeight: FontWeight.w400),
                           )),
-                      onChanged: (value) {
-
-                      },
+                        onChanged: (value) {
+                          provider.setPrix(value);
+                        },
+                        validator: (value){
+                          if(value!.isEmpty){
+                            return provider.validatePrix(prix: value);}
+                        }
                     ),
                     const SizedBox(height: 16,),
                     Divider(thickness: 1, color: AppColors.hintColor.withOpacity(0.4)),
@@ -355,6 +386,8 @@ class _NewPostState extends State<NewPost> {
                                     setState(() {
                                       sanitaire? sanitaire = false : sanitaire = true;
                                     });
+                                    provider.setSanitaire(sanitaire);
+                                    print(provider.sanitaire);
                                   },
                                   highlightColor: Colors.transparent,
                                   child: Row(
@@ -371,6 +404,7 @@ class _NewPostState extends State<NewPost> {
                                               setState(() {
                                                 sanitaire = value!;
                                               });
+
                                             }
                                         ),
                                       ),
@@ -389,6 +423,7 @@ class _NewPostState extends State<NewPost> {
                                     setState(() {
                                       electricite? electricite = false : electricite = true;
                                     });
+                                    provider.setElectricite(electricite);
                                   },
                                   child: Row(
                                     children: [
@@ -404,6 +439,7 @@ class _NewPostState extends State<NewPost> {
                                               setState(() {
                                                 electricite = value!;
                                               });
+
                                             }
                                         ),
                                       ),
@@ -422,6 +458,7 @@ class _NewPostState extends State<NewPost> {
                                     setState(() {
                                       wc? wc = false : wc = true;
                                     });
+                                    provider.setWc(wc);
                                   },
                                   child: Row(
                                     children: [
@@ -437,6 +474,7 @@ class _NewPostState extends State<NewPost> {
                                               setState(() {
                                                 wc = value!;
                                               });
+
                                             }
                                         ),
                                       ),
@@ -461,6 +499,7 @@ class _NewPostState extends State<NewPost> {
                                     setState(() {
                                       carreaux? carreaux = false : carreaux = true;
                                     });
+                                    provider.setCarreaux(carreaux);
                                   },
                                   child: Row(
                                     children: [
@@ -476,6 +515,7 @@ class _NewPostState extends State<NewPost> {
                                               setState(() {
                                                 carreaux = value!;
                                               });
+
                                             }
                                         ),
                                       ),
@@ -494,6 +534,7 @@ class _NewPostState extends State<NewPost> {
                                     setState(() {
                                       eau? eau = false : eau = true;
                                     });
+                                    provider.setEau(eau);
                                   },
                                   child: Row(
                                     children: [
@@ -543,18 +584,43 @@ class _NewPostState extends State<NewPost> {
                                 .headline1
                                 .copyWith(fontWeight: FontWeight.w400),
                           )),
-                      onChanged: (value) {
-
-                      },
+                        onChanged: (value) {
+                          provider.setDescription(value);
+                        },
+                        validator: (value){
+                          if(value!.isEmpty){
+                            return provider.validateDescription(description: value);}
+                        }
                     ),
                     const SizedBox(height: 16,),
-                    AppButton(onTap: (){
-                      context.push(AppPage.successPaiementSbee.toPath);
-                    },
-                      text: 'Publier',
-                      textColor: AppColors.white,
-                      backgroundColor: AppColors.primaryTwo,
-                    ),
+                    Consumer<PostController>(builder: (context, postProvider, child) {
+                      return Column(
+                        children: [
+                          AppButton(
+                            onTap: (){
+
+                            print(infoFormKey.currentState!.validate());
+                            if(infoFormKey.currentState!.validate() == true && provider.isValid){
+                              villeController.clear();
+                              returnHome.setEtat(0);
+                              returnHome.setIndex(0);
+                              }
+                            },
+
+                            widget: postProvider.requestLoading
+                            ? const CircularProgressIndicator(
+                             color: Colors.white,
+                            )
+                            : Text('Publier',
+                              style: AppTypography().buttonText.copyWith(color: AppColors.white),
+                              textAlign: TextAlign.center,),
+
+                            backgroundColor: AppColors.primaryTwo,
+                          ),
+                        ]
+
+                      );
+                      }),
                     const SizedBox(height: 20,),
                   ],
                 ),

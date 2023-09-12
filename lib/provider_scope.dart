@@ -1,8 +1,10 @@
 import 'package:location_app/core/provider/bottomNavigation/navigator_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:location_app/core/provider/validator/create_post_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'core/controllers/auth/auth_controller.dart';
+import 'core/controllers/auth/post_controller.dart';
 import 'core/provider/bottomNavigation/navigator_provider.dart';
 import 'core/provider/favorsProvider.dart';
 import 'core/provider/validator/inscription_provider.dart';
@@ -21,6 +23,8 @@ class ProviderScope extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider<PostController>(create: (_) => PostController()),
+        ChangeNotifierProvider<PostValidator>(create: (_) => PostValidator()),
         ChangeNotifierProvider<FavorsProvider>(create: (_) => FavorsProvider(0)),
         ChangeNotifierProvider<DashboardProvider>(create: (_) => DashboardProvider()),
         ChangeNotifierProvider<ValidatorProvider>(

@@ -104,13 +104,21 @@ class _ChatRoomViewState extends State<ChatRoomView> {
             IconButton(
               onPressed: _onThemeIconTap,
               icon: Icon(
+                Icons.more_vert,
+                color: theme.themeIconColor,
+              ),
+            ),
+            /*
+            IconButton(
+              onPressed: _onThemeIconTap,
+              icon: Icon(
                 isDarkTheme
                     ? Icons.brightness_4_outlined
                     : Icons.dark_mode_outlined,
                 color: theme.themeIconColor,
               ),
             ),
-            /*IconButton(
+            IconButton(
               tooltip: 'Toggle TypingIndicator',
               onPressed: _showHideTypingIndicator,
               icon: Icon(

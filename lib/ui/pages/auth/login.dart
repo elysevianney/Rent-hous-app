@@ -43,11 +43,11 @@ class _LoginState extends State<Login> {
       backgroundColor: AppColors.primaryTwo,
       appBar: AppBar(
         elevation: 0,
-        leading: Icon(
+        leading: const Icon(
           Icons.chevron_left,
           color: Colors.white,
         ),
-        title: Text('Se connecter ',
+        title: const Text('Se connecter ',
           style: TextStyle(
             color: Colors.white
           ),
@@ -64,12 +64,12 @@ class _LoginState extends State<Login> {
         ),
         child: SingleChildScrollView(
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 24,),
+            padding: const EdgeInsets.symmetric(horizontal: 24,),
             child: Column(
 
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 22,),
+                const SizedBox(height: 22,),
                 Text(
                   'Connectez vous à votre compte',
                   style: AppTypography().medium.copyWith(
@@ -78,7 +78,7 @@ class _LoginState extends State<Login> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SpaceH(15),
+                    const SpaceH(15),
                     Text(
                       "Vous n’avez pas de compte ? ",
                       style: AppTypography().headline1,
@@ -185,7 +185,7 @@ class _LoginState extends State<Login> {
                                   height: 60,
                                   decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                                      borderRadius: const BorderRadius.all(Radius.circular(30)),
                                       boxShadow: [
                                         BoxShadow(
                                             color: Colors.grey.withOpacity(0.3),
@@ -196,15 +196,15 @@ class _LoginState extends State<Login> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       Container(
-                                        padding: EdgeInsets.only(left: 18, right: 10),
-                                        child: Icon(Icons.lock,
+                                        padding: const EdgeInsets.only(left: 18, right: 10),
+                                        child: const Icon(Icons.lock,
                                           size: 30,
                                           color: AppColors.primaryTwo,
                                         ),
                                       ),
                                       Expanded(
                                         child: Container(
-                                          padding: EdgeInsets.only(right: 20),
+                                          padding: const EdgeInsets.only(right: 20),
                                           child: TextFormField(
                                             controller: password,
                                             obscureText: _obscureText,
@@ -263,7 +263,7 @@ class _LoginState extends State<Login> {
                           AppButton(
                             text: !authProvider.requestLoading ? 'Se connecter' : '',
                             widget: authProvider.requestLoading
-                                ? CircularProgressIndicator(
+                                ? const CircularProgressIndicator(
                               color: Colors.white,
                             )
                                 : null,
@@ -272,7 +272,7 @@ class _LoginState extends State<Login> {
                               if (infoFormKey.currentState!.validate() && email.text.isNotEmpty && password.text.isNotEmpty) {
                                 bool res = await authProvider.login(
                                     email.text, password.text);
-
+                                print(res);
                                 if (!res) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -305,13 +305,13 @@ class _LoginState extends State<Login> {
                             backgroundColor: provider.isauth && email.text.isNotEmpty && password.text.isNotEmpty
                                 ? AppColors.primaryTwo
                                 : AppColors.hintColor,
-                            raduis: BorderRadius.all(Radius.circular(15)),
+                            raduis: const BorderRadius.all(Radius.circular(15)),
                           )
                         ],
                       ),
                     );
                   }),
-                SizedBox(height: 12,),
+                const SizedBox(height: 12,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -328,7 +328,7 @@ class _LoginState extends State<Login> {
                         )),
                   ],
                 ),
-                SizedBox(height: 22,),
+                const SizedBox(height: 22,),
               ],
             ),
           ),
@@ -360,11 +360,11 @@ class InputError extends StatelessWidget {
         children: [
           Expanded(
             child: Container(
-              margin: EdgeInsets.only(top: 5),
-              padding: EdgeInsets.symmetric(horizontal: 40,),
+              margin: const EdgeInsets.only(top: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 40,),
               child: Text(text,
                 softWrap: true,
-                style: TextStyle(
+                style: const TextStyle(
                     color: Colors.red,
                     fontSize: 10
                 ),),

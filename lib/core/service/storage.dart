@@ -5,34 +5,51 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 
 class StorageService {
+  bool isSignedIn = false;
   Future<User?> getConnectedUser() async {
     User? user;
-    SharedPreferences pref = await SharedPreferences.getInstance();
+    final pref = await SharedPreferences.getInstance();
 
-    String? prefUser = pref.getString("connectedUser");
+    final prefUser = pref.getString('connectedUser');
 
     if (prefUser != null) {
-      user = User.fromJson(jsonDecode(prefUser));
+      user = User.fromJson(jsonDecode(prefUser) as Map<String, dynamic>);
     }
 
     return user;
   }
 
-  Future<void> saveConnectedUser(User user) async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
+  Future<String?> getUserToken() async {
+    final pref = await SharedPreferences.getInstance();
 
-    pref.setString('connectedUser', jsonEncode(user));
+    return pref.getString('userToken');
+
   }
 
-  Future<bool?> isFirstConnection() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
+  Future<void> saveConnectedUser(User? user) async {
+    final pref = await SharedPreferences.getInstance();
 
-    return pref.getBool('firstConnection');
+    await pref.setString('connectedUser', jsonEncode(user));
+  }
+
+  Future<void> saveUserToken(String? token) async {
+    final pref = await SharedPreferences.getInstance();
+
+    await pref.setString('userToken', token!);
+  }
+
+
+  Future<bool> isFirstConnection() async {
+    final pref = await SharedPreferences.getInstance();
+    return  isSignedIn = pref.getBool('firstConnection')??true;
   }
 
   Future<void> saveFirstConnection() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
+    final pref = await SharedPreferences.getInstance();
 
-    pref.setBool('firstConnection', true);
+    await pref.setBool('firstConnection', false);
+    isSignedIn = false;
   }
 }
+
+

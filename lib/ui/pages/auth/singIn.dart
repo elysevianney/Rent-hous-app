@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:location_app/export.dart';
 import 'package:location_app/ui/pages/auth/widget/sign_template.dart';
 
@@ -7,6 +8,7 @@ import '../../../core/provider/validator/inscription_provider.dart';
 import '../../../ressources/theme/color/app_color.dart';
 import '../../../utils_/constants/space.dart';
 import '../../common/app_inkwell.dart';
+import 'package:intl_phone_field/country_picker_dialog.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -34,7 +36,7 @@ class _SignInState extends State<SignIn> {
 
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
-
+  TextEditingController tel = TextEditingController();
   bool _obscureText = false;
   bool _obscureTextCorrect = false;
   bool checkedValue = true;
@@ -104,15 +106,15 @@ class _SignInState extends State<SignIn> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Container(
-                                padding: EdgeInsets.only(left: 18, right: 10),
-                                child: Icon(Icons.person,
+                                padding: const EdgeInsets.only(left: 18, right: 10),
+                                child: const Icon(Icons.person,
                                   size: 30,
                                   color: AppColors.primaryTwo,
                                 ),
                               ),
                               Expanded(
                                 child: Container(
-                                  padding: EdgeInsets.only(right: 20),
+                                  padding: const EdgeInsets.only(right: 20),
                                   child: TextFormField(
                                     controller: lastNameController,
                                     style: AppTypography()
@@ -153,7 +155,7 @@ class _SignInState extends State<SignIn> {
                     ],
                   ),
                   InputError(text: lastnameError,),
-                  SizedBox(height: 12,),
+                  const SizedBox(height: 12,),
                   Row(
                     children: [
                       Expanded(
@@ -161,7 +163,7 @@ class _SignInState extends State<SignIn> {
                           height: 60,
                           decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.all(Radius.circular(30)),
+                              borderRadius: const BorderRadius.all(Radius.circular(30)),
                               boxShadow: [
                                 BoxShadow(
                                     color: Colors.grey.withOpacity(0.3),
@@ -172,15 +174,15 @@ class _SignInState extends State<SignIn> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Container(
-                                padding: EdgeInsets.only(left: 18, right: 10),
-                                child: Icon(Icons.person,
+                                padding: const EdgeInsets.only(left: 18, right: 10),
+                                child: const Icon(Icons.person,
                                   size: 30,
                                   color: AppColors.primaryTwo,
                                 ),
                               ),
                               Expanded(
                                 child: Container(
-                                  padding: EdgeInsets.only(right: 20),
+                                  padding: const EdgeInsets.only(right: 20),
                                   child: TextFormField(
 
                                     controller: firstNameController,
@@ -222,14 +224,15 @@ class _SignInState extends State<SignIn> {
                     ],
                   ),
                   InputError(text: firstnameError,),
+
                   Visibility(
                     visible: firstnameError == ''? false: true ,
                     child: Row(
                       children: [
                         Expanded(
                           child: Container(
-                            margin: EdgeInsets.only(top: 5),
-                            padding: EdgeInsets.symmetric(horizontal: 40,),
+                            margin: const EdgeInsets.only(top: 5),
+                            padding: const EdgeInsets.symmetric(horizontal: 40,),
                             child: Text(firstnameError,
                               softWrap: true,
                               style: const TextStyle(
@@ -242,6 +245,81 @@ class _SignInState extends State<SignIn> {
                     ),
                   ),
                   const SizedBox(height: 12,),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: 60,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: const BorderRadius.all(Radius.circular(30)),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.grey.withOpacity(0.3),
+                                    spreadRadius: 0.8,
+                                    blurRadius: 20)
+                              ]),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.only(left: 18, right: 10),
+                                child: const Icon(Icons.person,
+                                  size: 30,
+                                  color: AppColors.primaryTwo,
+                                ),
+                              ),
+                              Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.only(right: 20),
+                                  child: IntlPhoneField(
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                                    ],
+                                    disableLengthCheck: true,
+                                    flagsButtonPadding: const EdgeInsets.only(left: 16),
+                                    pickerDialogStyle: PickerDialogStyle(
+                                      backgroundColor: AppColors.white,
+                                      countryNameStyle: AppTypography().authText,
+                                      countryCodeStyle: AppTypography().authText,
+                                    ),
+                                    invalidNumberMessage: "Numéro de téléphone incorrect",
+                                    controller: tel,
+                                    searchText: "Rechercher votre pays",
+                                    style: AppTypography()
+                                        .headline1
+                                        .copyWith(fontWeight: FontWeight.w400),
+                                    decoration: InputDecoration(
+                                        errorBorder: InputBorder.none,
+                                        enabledBorder: InputBorder.none,
+                                        focusedBorder: InputBorder.none,
+                                        focusedErrorBorder: InputBorder.none,
+                                        hintText: "Téléphone",
+                                        hintStyle: AppTypography()
+                                            .headline1
+                                            .copyWith(color: AppColors.hintColor, fontSize: 14.h),
+                                        label: Text(
+                                          "Téléphone",
+                                          style: AppTypography().headline1.copyWith(
+                                              fontWeight: FontWeight.w400, fontSize: 14.h),
+                                        )),
+                                    initialCountryCode: 'BJ',
+                                    validator: (phone) {
+                                      provider.validatePhone(phoneNumber: phone?.number);
+                                      provider.getDialCode(phone?.countryCode ?? "");
+                                      provider.getTel(phone?.number ?? "");
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12,),
                   Consumer<AuthController>(builder: (context, authProvider, child) {
                     return Column(
                       children: [
@@ -251,7 +329,7 @@ class _SignInState extends State<SignIn> {
                               child: Container(
                                 decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.all(Radius.circular(30)),
+                                    borderRadius: const BorderRadius.all(Radius.circular(30)),
                                     boxShadow: [
                                       BoxShadow(
                                           color: Colors.grey.withOpacity(0.3),
@@ -394,7 +472,7 @@ class _SignInState extends State<SignIn> {
                           ],
                         ),
                         InputError(text: passwordError,),
-                        SizedBox(height: 12,),
+                        const SizedBox(height: 12,),
                         Row(
                           children: [
                             Expanded(
@@ -402,7 +480,7 @@ class _SignInState extends State<SignIn> {
                                 height: 60,
                                 decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.all(Radius.circular(30)),
+                                    borderRadius: const BorderRadius.all(Radius.circular(30)),
                                     boxShadow: [
                                       BoxShadow(
                                           color: Colors.grey.withOpacity(0.3),
@@ -413,7 +491,7 @@ class _SignInState extends State<SignIn> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Container(
-                                      padding: EdgeInsets.only(left: 18, right: 10),
+                                      padding: const EdgeInsets.only(left: 18, right: 10),
                                       child: const Icon(Icons.lock,
                                         size: 30,
                                         color: AppColors.primaryTwo,
@@ -527,7 +605,7 @@ class _SignInState extends State<SignIn> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 12,),
+                        const SizedBox(height: 12,),
                         AppButton(
                           text: !authProvider.requestLoading ? 'S’inscrire' : '',
                           widget: authProvider.requestLoading
@@ -542,9 +620,10 @@ class _SignInState extends State<SignIn> {
                                 firstname: provider.firstname,
                                 lastname: provider.lastname,
                                 email: provider.mail,
-                                password: provider.password,
+                                password: provider.password, phone: provider.phone.toString(),
                               );
 
+                              print(payload.toString());
                               bool success =
                               await authProvider.register(payload);
 

@@ -16,4 +16,15 @@ class Imgs {
   final deposit = "assets/images/deposit_white.png";
   final deposit_orange = "assets/images/deposit_orange.png";
   final banner = "assets/images/banner.png";
+
+  final appart1_1 = "assets/images/appart1-1.jpg";
+  final appart1_2 = "assets/images/appart1-2.jpg";
+  final appart1_3 = "assets/images/appart1-3.jpg";
+  final appart2_1 = "assets/images/appart2-1.jpg";
+  final appart2_2 = "assets/images/appart2-2.jpg";
+  final appart2_3 = "assets/images/appart2-3.jpg";
+  final appart3_1 = "assets/images/appart3-1.jpg";
+  final appart3_2 = "assets/images/appart3-2.jpg";
+  final appart3_3 = "assets/images/appart3-3.jpg";
+
 }

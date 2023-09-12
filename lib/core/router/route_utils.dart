@@ -12,7 +12,9 @@ enum AppPage {
   successPaiementSbee,
   newPost,
   chatRoom,
-  otherUserProfil
+  otherUserProfil,
+  myPosts,
+  detailPostOfUser
 }
 
 extension AppPageExtension on AppPage {
@@ -20,6 +22,10 @@ extension AppPageExtension on AppPage {
     switch (this) {
       case AppPage.detailPost:
         return "/detailPost";
+      case AppPage.detailPostOfUser:
+        return "/detailPostOfUser";
+      case AppPage.myPosts:
+        return "/myPosts";
       case AppPage.otherUserProfil:
         return "/otherUserProfil";
       case AppPage.newPost:
@@ -53,8 +59,12 @@ extension AppPageExtension on AppPage {
 
   String get toName {
     switch (this) {
+      case AppPage.myPosts:
+        return "MYPOSTS";
       case AppPage.splashScreen:
         return "DETAILPRODUCT";
+      case AppPage.detailPostOfUser:
+        return "DETAILPOSTOFUSER";
       case AppPage.otherUserProfil:
         return "OTHERUSERPROFIL";
       case AppPage.chatRoom:

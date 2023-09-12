@@ -1,12 +1,14 @@
-import '../../../export.dart';
-import '../../models/payloads/register_request.dart';
+import 'package:location_app/core/models/post.dart';
+import 'package:location_app/core/service/api/annonce/annonce_service.dart';
 
+import '../../../export.dart';
+
+import '../../models/payloads/register_request.dart';
 import '../../models/session.dart';
-import '../../models/token.dart';
 import '../../models/user.dart';
 import '../../service/api/auth/auth_service.dart';
 import '../../service/storage.dart';
-class AuthController extends ChangeNotifier {
+class PostController extends ChangeNotifier {
   final AuthService _authService = AuthService();
 
   bool _requestLoading = false;
@@ -35,11 +37,44 @@ class AuthController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Session? get session => _session;
+  final AnnonceService _annonceService = AnnonceService();
+  List<Annonce>? _allAnnonces;
+  List<Annonce>? get allAnnonceService => _allAnnonces;
 
-  set session(Session? session) {
-    _session = session;
-    notifyListeners();
+  Future<List<Annonce>?> getAnnonce() async {
+    _allAnnonces = await _annonceService.getAnnonce();
+    if (_allAnnonces != null) {
+      return _allAnnonces;
+    } else {
+      return null;
+    }
+  }
+  Future<Annonce?> viewAnnonce(String id) async {
+    Annonce? annonce = await _annonceService.viewAnnonce(id);
+    if (annonce != null) {
+      return annonce;
+    } else {
+      return null;
+    }
+  }
+
+
+  Future<bool> createPost() async {
+    requestLoading = true;
+    bool success = false;
+
+    try {
+
+      return success;
+    } catch (e) {
+      hasError = true;
+      errorMessage = e.toString();
+    } finally {
+      requestLoading = false;
+      notifyListeners();
+    }
+
+    return success;
   }
 
   Future<bool> login(String email, String password) async {
@@ -47,25 +82,25 @@ class AuthController extends ChangeNotifier {
     bool success = false;
 
     try {
-      Token? res = await _authService.login(email, password);
+      User? res = await _authService.login(email, password);
 
       if (res != null) {
-        await StorageService().saveUserToken(res.token);
-        _session = Session(accessToken: res.token);
+        _session = Session(connectedUser: res);
         success = true;
+        await StorageService().saveConnectedUser(_session!.connectedUser);
+        print(res);
       }
     } on Exception catch (e) {
       hasError = true;
       errorMessage = e.toString();
-    }
-    finally {
+    } finally {
       requestLoading = false;
       notifyListeners();
     }
+    print(success.toString());
 
     return success;
-
-}
+  }
 
   Future<bool> register(RegisterRequest payload) async {
     requestLoading = true;

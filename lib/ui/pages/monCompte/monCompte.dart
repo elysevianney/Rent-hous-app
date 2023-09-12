@@ -77,10 +77,16 @@ class _MonCompteState extends State<MonCompte> {
           ),
           Text('LALY Audrey', style: AppTypography().welcome.copyWith(color: AppColors.black2),),
 
-          const Column(children: [
-            MonCompteElement(label: 'Mes informations personnelles', icon: Icons.mode_edit_rounded,),
-            MonCompteElement(label: 'Mes annonces', icon: Icons.edit_note_rounded,),
-            MonCompteElement(label: 'Déconnexion', icon: Icons.logout,)
+           Column(children: [
+            MonCompteElement(label: 'Mes informations personnelles', icon: Icons.mode_edit_rounded, onPress: () {
+
+            },),
+            MonCompteElement(label: 'Mes annonces', icon: Icons.edit_note_rounded, onPress: () {
+              context.push('${AppPage.myPosts.toPath}');
+            },),
+            MonCompteElement(label: 'Déconnexion', icon: Icons.logout, onPress: () {
+
+            },)
           ],)
 
         ],
@@ -92,8 +98,9 @@ class _MonCompteState extends State<MonCompte> {
 
 class MonCompteElement extends StatelessWidget {
   const MonCompteElement({
-    super.key, required this.label, required this.icon,
+    super.key, required this.label, required this.icon, required this.onPress,
   });
+  final VoidCallback onPress;
   final String label;
   final IconData icon;
   @override
@@ -102,9 +109,7 @@ class MonCompteElement extends StatelessWidget {
       children: [
         Expanded(
           child: InkWell(
-            onTap: (){
-
-            },
+            onTap: onPress,
             highlightColor: AppColors.orangeHint,
             hoverColor: AppColors.orangeHint,
             focusColor: AppColors.orangeHint,

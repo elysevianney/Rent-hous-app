@@ -3,11 +3,31 @@ import 'package:location_app/export.dart';
 class ValidatorProvider extends ChangeNotifier {
   String lastname = "";
   String firstname = "";
-
+  String dialCode = "+229";
+  String phone = "";
   String mail = "";
   String password = "";
   String passwordConfirm = "";
 
+  //check phone number
+  String? validatePhone({required String? phoneNumber}) {
+    Pattern pattern = r'[0-9]';
+
+    RegExp regex = RegExp(pattern as String);
+    if (phoneNumber!.isEmpty) {
+      return "Veuillez saisir votre numéro de téléphone";
+    } else if (!regex.hasMatch(phoneNumber)) {
+      return "Le numéro de ne doit contenir que des chiffres";
+    }
+    phone = dialCode + phoneNumber;
+    notifyListeners();
+    return null;
+  } //end validatePhone
+  //get dial code
+  getDialCode(String dialCode) {
+    dialCode = dialCode;
+    notifyListeners();
+  } // end getDialCode
 
 
   bool get isValid {
@@ -70,6 +90,10 @@ class ValidatorProvider extends ChangeNotifier {
 
 
 
+  getTel(String tel) {
+    phone = tel;
+    notifyListeners();
+  }
 
   getFirstname(String firsname) {
     firstname = firsname;

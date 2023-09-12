@@ -4,7 +4,7 @@ import '../../../utils_/interceptors/logger.dart';
 
 class ApiService {
   static final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'http://arenecelsia.hecamacb.com/celsia/visitbj/public/api',
+    baseUrl: 'http://142.93.41.242:8003/api/v1',
   ))
     ..interceptors.addAll([
       Logger(),

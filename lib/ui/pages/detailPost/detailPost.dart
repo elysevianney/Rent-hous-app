@@ -1,6 +1,9 @@
 
 
+import 'package:location_app/core/controllers/auth/post_controller.dart';
 import 'package:location_app/export.dart';
+
+import '../../../core/models/post.dart';
 
 class DetatlPost extends StatefulWidget {
   const DetatlPost({Key? key, required this.username}) : super(key: key);
@@ -13,18 +16,24 @@ class DetatlPost extends StatefulWidget {
 class _DetatlPostState extends State<DetatlPost> {
   _DetatlPostState(this.username);
   final String username;
+
+  var _popupMenuItemIndex = 0;
   @override
   Widget build(BuildContext context) {
+    PostController postController = Provider.of<PostController>(context);
 
-    Iterable<Annonce> annonce = allAnnonces.where((element) => element.username.compareTo(username) == 0);
+/*
+    Iterable<Annoncess> annonce = allAnnonces.where((element) => element.username.compareTo(username) == 0);
     print(allAnnonces);
     print(annonce);
-    Annonce annonceDetails = annonce.elementAt(0);
+    Annoncess annonceDetails = annonce.elementAt(0);
+
+    ///Others details
     bool sanitaire = annonceDetails.doucheSanitaire;
     bool wc = annonceDetails.wc;
     bool carreaux = annonceDetails.carreaux;
     bool electricite = annonceDetails.electricite;
-    bool eau = annonceDetails.eau;
+    bool eau = annonceDetails.eau;*/
 
     return Scaffold(
       bottomNavigationBar: Container(
@@ -32,9 +41,9 @@ class _DetatlPostState extends State<DetatlPost> {
         child: AppButton(onTap: (){
 
         },
-          text: 'S\'interresser',
+          text: 'ça m\'interresse',
           textColor: AppColors.white,
-          backgroundColor: AppColors.primaryTwo,
+          backgroundColor: AppColors.primaryTwo ,
         ),
       ),
       body: NestedScrollView(
@@ -42,300 +51,323 @@ class _DetatlPostState extends State<DetatlPost> {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
-              surfaceTintColor: Colors.white,
+              surfaceTintColor: AppColors.primaryTwo,
               pinned: true,
-              backgroundColor: Colors.white,
-              title: Text('Annonce de $username',
+              backgroundColor: AppColors.primaryTwo,
+              title: Text('Annonce',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: AppTypography().medium.copyWith(
                   fontSize: 16,
-                  color: AppColors.black2
+                  color: AppColors.white
               ),),
               shape: const Border(bottom: BorderSide(color: AppColors.brown, width: 0.5)),
               centerTitle: false,
-              leading: InkWell(
-                highlightColor: AppColors.primaryTwo,
-                onTap: (){
+              leading: IconButton(
+                highlightColor: AppColors.white.withOpacity(0.4),
+                onPressed: (){
                   context.pop();
                 },
-                child: const Icon(
+                icon: const Icon(
                   Icons.arrow_back_rounded,
-                  color: AppColors.black2,
+                  color: AppColors.white,
                   size: 25,
                 ),
               ),
             ),
           ] ;
         },
-        body: ListView(
-          children:  [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      Image.asset(annonceDetails.userProfilPath),
-                      const SizedBox(width: 12,),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 1.0),
-                            child: Text('$username',
-                              style: AppTypography().title,
-                            ),
-                          ),
-                          Text('2h',
-                            style: AppTypography().subtitle,
-                          ),
+        body: FutureBuilder<Annonce?>(
+          future: postController.viewAnnonce(username),
+          builder: (BuildContext context,
+              AsyncSnapshot<Annonce?> snapshot) {
+            print("akoba ${postController.viewAnnonce(username)}");
 
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12,),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Hero(
-                        tag: 'ima',
-                        child: ImageSlider(prix: annonceDetails.price.toString(),
-                          imagesPath: annonceDetails.imagePath),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12,),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                  child: Column(
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else if (!snapshot.hasData || snapshot.data == null) {
+              return const Text('Aucun pack disponible');
+            } else {
+              Annonce? element = snapshot.data;
+              List<String> imgP = [];
+              for(int i = 0; i< element!.image.length; i++){
+
+                imgP.add(element!.image.elementAt(i).url);
+              }
+              bool sanitaire = element!.sanitaire;
+              bool carreaux =element!.carrele;
+              bool electricite = element!.electricite;
+              bool eau = element!.eau;
+              return ListView(
+                children:  [
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.location_pin, color: AppColors.primaryTwo, size: 18,),
-                          const SizedBox(width: 8,),
-                          Text('${annonceDetails.ville}, ${annonceDetails.quartier}',
-                            style: AppTypography().title,
-                          ),
-                        ],
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          children: [
+                            Image.asset($AppAssets.imgs.profil),
+                            const SizedBox(width: 12,),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 1.0),
+                                  child: Text('${element?.user.firstName} ${element?.user.lastName}',
+                                    style: AppTypography().title,
+                                  ),
+                                ),
+                                Text('${element?.createdAt}',
+                                  style: AppTypography().subtitle,
+                                ),
+
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 12,),
                       Row(
                         children: [
-                          SvgPicture.asset($AppAssets.svgs.price, width: 15,),
-                          Padding(
-                            padding: const EdgeInsets.only(left:10, right: 8.0),
-                            child: Text(annonceDetails.price.toString(),
-                                style: AppTypography().title.copyWith(fontSize: 16,color: AppColors.primaryTwo)
+                          Expanded(
+                            child: Stack(
+                              children: [
+                                ImageSlider(prix: element!.prix.toString(),
+                                    imagesPath: imgP),
+                                (element!.status == false) ?
+                                Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 8 ),
+                                      decoration: const BoxDecoration(
+                                          color: AppColors.primaryTwo,
+                                          borderRadius: BorderRadius.only( bottomLeft: Radius.circular(12))
+                                      ),
+                                      child: Center(
+                                        child: Text('Annonce prise',
+                                          style: AppTypography().title.copyWith(
+                                              fontSize: 12,
+                                              color: AppColors.white
+                                          ),
+                                        ),),
+                                    )
+                                )
+                                    :
+                                SizedBox(),
+                              ],
                             ),
-                          ),
-                          Text('/personne ',
-                              style: AppTypography().title.copyWith(fontSize: 16, color: AppColors.black2)
                           ),
                         ],
                       ),
                       const SizedBox(height: 12,),
-                    ],
-                  ),
-                ),
-                Divider(),
-                const SizedBox(height: 12,),
-                Padding(padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          HouseContentDetails(imagePath: $AppAssets.svgs.friends, nber: annonceDetails.nbPersonne, element: 'personnes',),
-                          const SizedBox(height: 12,),
-                          HouseContentDetails(imagePath: $AppAssets.svgs.lit, nber: annonceDetails.nbChambre, element: 'chambres',),
-                          const SizedBox(height: 12,),
-                          HouseContentDetails(imagePath: $AppAssets.svgs.douche, nber: annonceDetails.nbDouche, element: 'douche',),
-                        ],
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.location_pin, color: AppColors.primaryTwo, size: 18,),
+                                const SizedBox(width: 8,),
+                                Text('${element!.ville}, ${element!.quatier}',
+                                  style: AppTypography().title,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12,),
+                            Row(
+                              children: [
+                                SvgPicture.asset($AppAssets.svgs.price, width: 15,),
+                                Padding(
+                                  padding: const EdgeInsets.only(left:10, right: 8.0),
+                                  child: Text(element!.prix.toString(),
+                                      style: AppTypography().title.copyWith(fontSize: 16,color: AppColors.primaryTwo)
+                                  ),
+                                ),
+                                Text('F/personne ',
+                                    style: AppTypography().title.copyWith(fontSize: 16, color: AppColors.black2)
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12,),
+                          ],
+                        ),
                       ),
+                      Divider(),
+                      const SizedBox(height: 12,),
+                      Padding(padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                HouseContentDetails(imagePath: $AppAssets.svgs.friends, nber: element!.nbrePersonne, element: 'personnes',),
+                                const SizedBox(height: 12,),
+                                HouseContentDetails(imagePath: $AppAssets.svgs.lit, nber: element!.nbreChambre, element: 'chambres',),
+                                const SizedBox(height: 12,),
+                                HouseContentDetails(imagePath: $AppAssets.svgs.douche, nber: element!.nbreDouche, element: 'douche',),
+                              ],
+                            ),
+
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12,),
+                      Divider(),
+                      const SizedBox(height: 12,),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Visibility(
+                              visible: electricite,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child:  Checkbox(
+                                            checkColor: AppColors.white,
+                                            activeColor: AppColors.primaryTwo,
+                                            value: true,
+                                            onChanged: (bool? value) {
+                                            }
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10,),
+                                      Text('Electricité disponible',
+                                        style: AppTypography().autreDetails.copyWith(
+                                            color: AppColors.black2
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12,),
+                                ],
+                              ),
+                            ),
+                            Visibility(
+                              visible: eau,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child:  Checkbox(
+                                            checkColor: AppColors.white,
+                                            activeColor: AppColors.primaryTwo,
+                                            value: true,
+                                            onChanged: (bool? value) {
+                                            }
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10,),
+                                      Text('Eau disponible',
+                                        style: AppTypography().autreDetails.copyWith(
+                                            color: AppColors.black2
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12,),
+                                ],
+                              ),
+                            ),
+                            Visibility(
+                              visible: sanitaire,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child:  Checkbox(
+                                            checkColor: AppColors.white,
+                                            activeColor: AppColors.primaryTwo,
+                                            value: true,
+                                            onChanged: (bool? value) {
+                                            }
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10,),
+                                      Text('Douche sanitaire',
+                                        style: AppTypography().autreDetails.copyWith(
+                                            color: AppColors.black2
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12,),
+                                ],
+                              ),
+                            ),
+                            Visibility(
+                              visible: carreaux,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child:  Checkbox(
+                                            checkColor: AppColors.white,
+                                            activeColor: AppColors.primaryTwo,
+                                            value: true,
+                                            onChanged: (bool? value) {
+                                            }
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10,),
+                                      Text('Sol carrelé',
+                                        style: AppTypography().autreDetails.copyWith(
+                                            color: AppColors.black2
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12,),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Divider(),
+                      const SizedBox(height: 12,),
+                      Padding(
+                        padding:  EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          element!.description,
+                          style: AppTypography().autreDetails.copyWith(
+                              color: AppColors.black2,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12,),
 
                     ],
                   ),
-                ),
-                const SizedBox(height: 12,),
-                Divider(),
-                const SizedBox(height: 12,),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Visibility(
-                        visible: electricite,
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 14,
-                                  height: 14,
-                                  child:  Checkbox(
-                                      checkColor: AppColors.white,
-                                      activeColor: AppColors.primaryTwo,
-                                      value: true,
-                                      onChanged: (bool? value) {
-                                      }
-                                  ),
-                                ),
-                                const SizedBox(width: 10,),
-                                Text('Electricité disponible',
-                                  style: AppTypography().autreDetails.copyWith(
-                                      color: AppColors.black2
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12,),
-                          ],
-                        ),
-                      ),
-                      Visibility(
-                        visible: eau,
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 14,
-                                  height: 14,
-                                  child:  Checkbox(
-                                      checkColor: AppColors.white,
-                                      activeColor: AppColors.primaryTwo,
-                                      value: true,
-                                      onChanged: (bool? value) {
-                                      }
-                                  ),
-                                ),
-                                const SizedBox(width: 10,),
-                                Text('Eau disponible',
-                                  style: AppTypography().autreDetails.copyWith(
-                                      color: AppColors.black2
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12,),
-                          ],
-                        ),
-                      ),
-                      Visibility(
-                        visible: sanitaire,
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 14,
-                                  height: 14,
-                                  child:  Checkbox(
-                                      checkColor: AppColors.white,
-                                      activeColor: AppColors.primaryTwo,
-                                      value: true,
-                                      onChanged: (bool? value) {
-                                      }
-                                  ),
-                                ),
-                                const SizedBox(width: 10,),
-                                Text('Douche sanitaire',
-                                  style: AppTypography().autreDetails.copyWith(
-                                      color: AppColors.black2
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12,),
-                          ],
-                        ),
-                      ),
-                      Visibility(
-                        visible: wc,
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 14,
-                                  height: 14,
-                                  child:  Checkbox(
-                                      checkColor: AppColors.white,
-                                      activeColor: AppColors.primaryTwo,
-                                      value: true,
-                                      onChanged: (bool? value) {
-                                      }
-                                  ),
-                                ),
-                                const SizedBox(width: 10,),
-                                Text('Toilettes disponibles',
-                                  style: AppTypography().autreDetails.copyWith(
-                                      color: AppColors.black2
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12,),
-                          ],
-                        ),
-                      ),
-                      Visibility(
-                        visible: carreaux,
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 14,
-                                  height: 14,
-                                  child:  Checkbox(
-                                      checkColor: AppColors.white,
-                                      activeColor: AppColors.primaryTwo,
-                                      value: true,
-                                      onChanged: (bool? value) {
-                                      }
-                                  ),
-                                ),
-                                const SizedBox(width: 10,),
-                                Text('Sol carrelé',
-                                  style: AppTypography().autreDetails.copyWith(
-                                      color: AppColors.black2
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12,),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Divider(),
-                const SizedBox(height: 12,),
-                Padding(
-                  padding:  EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard ezeezg Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum ha',
-                    style: AppTypography().autreDetails.copyWith(
-                        color: AppColors.black2,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12,),
-
-              ],
-            ),
-          ],
-        ),
+                ],
+              );
+            }
+          },
+        )
+        /*,*/
 
       ),
     );
@@ -355,7 +387,7 @@ class _ImageSliderState extends State<ImageSlider> {
   final List<String> imagesPath ;
 
   _ImageSliderState(this.prix, this.imagesPath);
-  final List<AssetImage> _pages = [
+  final List<NetworkImage> _pages = [
   ];
 
 
@@ -365,7 +397,7 @@ class _ImageSliderState extends State<ImageSlider> {
   void initState() {
     for(int i = 0; i < imagesPath.length; i++){
       _pages.add(
-          AssetImage(imagesPath.elementAt(i))
+          NetworkImage(imagesPath.elementAt(i))
       );
     }
 
@@ -416,7 +448,9 @@ class _ImageSliderState extends State<ImageSlider> {
                 return Container(
                   height: 260,
                   decoration: BoxDecoration(
-                      image: DecorationImage(image: _pages[index % _pages.length], fit: BoxFit.cover)
+                      image: DecorationImage(
+                          image: _pages[index % _pages.length],
+                          fit: BoxFit.cover)
                   ),
                   child: const SizedBox(),
                 );
@@ -474,7 +508,7 @@ class HouseContentDetails extends StatelessWidget {
   }
 }
 
-class Annonce extends StatelessWidget {
+class Annoncess extends StatelessWidget {
   final String username;
   final String userProfilPath;
   final List<String> imagePath;
@@ -490,8 +524,9 @@ class Annonce extends StatelessWidget {
   final bool electricite;
   final bool eau;
   final bool wc;
-  const Annonce({
-    super.key, required this.username, required this.imagePath, required this.price, required this.ville, required this.quartier, required this.nbChambre, required this.nbPersonne, required this.nbDouche, required this.userProfilPath, required this.description, required this.doucheSanitaire, required this.carreaux, required this.electricite, required this.eau, required this.wc,
+  final bool status;
+  const Annoncess({
+    super.key, required this.username, required this.imagePath, required this.price, required this.ville, required this.quartier, required this.nbChambre, required this.nbPersonne, required this.nbDouche, required this.userProfilPath, required this.description, required this.doucheSanitaire, required this.carreaux, required this.electricite, required this.eau, required this.wc, required this.status,
   });
 
   @override
@@ -628,9 +663,9 @@ class HouseContent extends StatelessWidget {
     );
   }
 }
-List<Annonce> allAnnonces = [
+List<Annoncess> allAnnonces = [
 
-  Annonce(username: 'Vianney AHM',
+  Annoncess(username: 'Vianney AHM',
       imagePath: [$AppAssets.imgs.maison,
         $AppAssets.imgs.maison,
         $AppAssets.imgs.maison,],
@@ -640,22 +675,22 @@ List<Annonce> allAnnonces = [
       carreaux: true,
       eau:  true,
       electricite: true,
-    wc: true,
+    wc: true, status: true,
 
   ),
-  Annonce(username: 'Audrey LALI',
-      imagePath: [$AppAssets.imgs.maison,
-        $AppAssets.imgs.maison,
-        $AppAssets.imgs.maison,],
-      price: 1000, ville: 'Calavi', quartier: 'Zogbadje', nbChambre: 2, nbPersonne: 23, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil
-    ,description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard ezeezg Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum ha',
+  Annoncess(username: 'Audrey LALI',
+      imagePath: [$AppAssets.imgs.appart2_1,
+        $AppAssets.imgs.appart2_2,
+        $AppAssets.imgs.appart2_3,],
+      price: 10000, ville: 'Calavi', quartier: 'Zogbadje', nbChambre: 1, nbPersonne: 1, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil
+    ,description: 'Bonjour à tous. Je vous propose cet appartement  une chambre-salon qui est à Zogbagjè dèrrire l\'UAC. Ceci pourrait vraiment aider un étudiant. N\'hésitez pas à me contacter',
     doucheSanitaire: true,
     carreaux: true,
     eau:  true,
     electricite: true,
-    wc: true,
+    wc: true, status: true,
   ),
-  Annonce(username: 'Anaelle',
+  Annoncess(username: 'Anaelle',
       imagePath: [$AppAssets.imgs.maison,
         $AppAssets.imgs.maison,
         $AppAssets.imgs.maison,],
@@ -665,9 +700,9 @@ List<Annonce> allAnnonces = [
     carreaux: true,
     eau:  true,
     electricite: true,
-    wc: true,
+    wc: true, status: true,
   ),
-  Annonce(username: 'Celsia',
+  Annoncess(username: 'Celsia',
       imagePath: [$AppAssets.imgs.maison,
         $AppAssets.imgs.maison,
         $AppAssets.imgs.maison,],
@@ -677,9 +712,9 @@ List<Annonce> allAnnonces = [
     carreaux: true,
     eau:  true,
     electricite: true,
-    wc: true,
+    wc: true, status: false,
   ),
-  Annonce(username: 'Vianney AHM',
+  Annoncess(username: 'Vianney AHM',
       imagePath: [$AppAssets.imgs.maison,
         $AppAssets.imgs.maison,
         $AppAssets.imgs.maison,],
@@ -689,6 +724,6 @@ List<Annonce> allAnnonces = [
     carreaux: true,
     eau:  true,
     electricite: true,
-    wc: true,
+    wc: true, status: true,
   ),
 ];

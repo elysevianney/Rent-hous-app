@@ -1,5 +1,6 @@
 /*import 'dart:js';
 */
+import 'package:location_app/ui/pages/MyPosts/MyPosts.dart';
 import 'package:location_app/ui/pages/getStarted/getStarted.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:location_app/export.dart';
@@ -8,6 +9,7 @@ import 'package:location_app/ui/pages/auth/singIn.dart';
 import 'package:location_app/ui/pages/otherUserProfil/OtherUserProfil.dart';
 
 import '../../ui/pages/Layout/layout.dart';
+import '../../ui/pages/detailPostOfUser/detailPostOfUser.dart';
 //import 'package:proxy_market/export.dart';
 
 class AppRouter {
@@ -30,6 +32,20 @@ class AppRouter {
         );
       },
       routes: [
+        GoRoute(
+            path: '${AppPage.detailPostOfUser.toPath}/:username',
+            name: AppPage.detailPostOfUser.toName,
+            builder: (context, state){
+              return DetailPostOfUser(username: state.pathParameters['username'].toString());
+            }
+        ),
+        GoRoute(
+            path: '${AppPage.myPosts.toPath}'/*/:otherUserId*/,
+            name: AppPage.myPosts.toName,
+            builder: (context, state){
+              return MyPosts(/*otherUserId: 'Anaelle', state.pathParameters['username'].toString()*/);
+            }
+        ),
         GoRoute(
           path: '${AppPage.otherUserProfil.toPath}'/*/:otherUserId*/,
           name: AppPage.otherUserProfil.toName,
