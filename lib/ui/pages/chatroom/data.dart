@@ -10,7 +10,7 @@ class Data {
       createdAt: DateTime.now(),
       sendBy: '1', // userId of who sends the message
       status: MessageStatus.read,
-    ),Message(
+    )/*,Message(
       id: '2',
       message: "Oui, salut. J'èspere que vous allez bien. Pouvez vous présenter?",
       createdAt: DateTime.now(),
@@ -31,7 +31,7 @@ class Data {
       sendBy: '2', // userId of who sends the message
       status: MessageStatus.read,
     ),
-    /*Message(
+    Message(
       id: '2',
       message: "Hi!",
       createdAt: DateTime.now(),

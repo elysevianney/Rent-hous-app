@@ -8,8 +8,10 @@ class Token {
   final String? token;
   final String? firstName;
   final String? email;
+  final String? id;
 
   Token({
+    this.id,
     this.status,
     this.token,
     this.firstName,
@@ -17,6 +19,7 @@ class Token {
   });
 
   factory Token.fromJson(Map<String, dynamic> json) => Token(
+    id: json['id'] as String?,
     status: json['status'] as bool?,
     token: json['token'] as String?,
     firstName: json['first_name'] as String?,
@@ -24,6 +27,7 @@ class Token {
   );
 
   Map<String, dynamic> toJson() => {
+    'id': id,
     'status': status,
     'token': token,
     'first_name': firstName,

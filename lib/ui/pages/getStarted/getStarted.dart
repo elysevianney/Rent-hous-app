@@ -36,7 +36,7 @@ class GetStarted extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      context.push(AppPage.signIn.toPath);
+                      context.pushReplacement(AppPage.signIn.toPath);
                     },
                     child:
                     Text('Inscrivez-vous', style: AppTypography().getStartedButton.copyWith(color: AppColors.white)),

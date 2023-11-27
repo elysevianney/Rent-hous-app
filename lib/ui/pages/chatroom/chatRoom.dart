@@ -1,6 +1,8 @@
 
+import 'package:location_app/core/models/chat.dart';
 import 'package:location_app/export.dart';
 import 'package:chatview/chatview.dart';
+import '../../../core/controllers/auth/chat_controller.dart';
 import 'theme.dart';
 import 'data.dart';
 class ChatRoomView extends StatefulWidget {
@@ -27,6 +29,7 @@ String profileImage = "https://miro.medium.com/max/1000/0*s7of7kWnf9fDg4XM.jpeg"
   ),
 ];*/
 class _ChatRoomViewState extends State<ChatRoomView> {
+
 
   final String secondUserID;
   _ChatRoomViewState(this.secondUserID);
@@ -58,12 +61,16 @@ class _ChatRoomViewState extends State<ChatRoomView> {
     _chatController.setTypingIndicator = !_chatController.showTypingIndicator;
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     //print(Data.messageList[4].createdAt);
+    /*sfinal chat_controller = Provider.of<ChatDataController>(context);
+    Future<Chat?> chat = chat_controller.viewChat(secondUserID);*/
 
     Iterable<User_s> secondUserT = myUserList.where((element) => element.userId.compareTo(secondUserID.toString()) == 0);
-    User_s secondUser = secondUserT.elementAt(0);
+    //User_s secondUser = secondUserT.elementAt(0);
     return Scaffold(
       body: ChatView(
         currentUser: currentUser,
@@ -91,7 +98,7 @@ class _ChatRoomViewState extends State<ChatRoomView> {
           backGroundColor: theme.appBarColor,
           profilePicture: Data.profileImage,
           backArrowColor: theme.backArrowColor,
-          chatTitle: secondUser.username,
+          chatTitle: 'Audrey',
           chatTitleTextStyle: TextStyle(
             color: theme.appBarTitleTextStyle,
             fontWeight: FontWeight.bold,

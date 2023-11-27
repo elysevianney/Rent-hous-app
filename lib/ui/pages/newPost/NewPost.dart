@@ -2,6 +2,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:location_app/core/controllers/auth/post_controller.dart';
+import 'package:location_app/core/models/payloads/createPost_request.dart';
 import 'package:location_app/core/provider/validator/create_post_provider.dart';
 import 'package:location_app/export.dart';
 
@@ -35,21 +36,30 @@ class _NewPostState extends State<NewPost> {
   //Image picker
   final ImagePicker myImagePicker = ImagePicker();
   List<XFile> imagePickedList = [];
-  void selctImage() async {
-    final List<XFile>? selectedImage = await myImagePicker.pickMultiImage();
-    if(selectedImage!.isNotEmpty){
-      imagePickedList!.addAll(selectedImage);
-    }
-    setState(() {
-      
-    });
-  }
+
 
   @override
   Widget build(BuildContext context) {
 
+
+
     final provider = Provider.of<PostValidator>(context);
+    final postController = Provider.of<PostController>(context);
     DashboardProvider returnHome = Provider.of<DashboardProvider>(context);
+
+    void selctImage() async {
+      final List<XFile>? selectedImage = await myImagePicker.pickMultiImage();
+      if(selectedImage!.isNotEmpty){
+        imagePickedList!.addAll(selectedImage);
+      }
+      setState(() {
+
+      });
+      provider.setzeroPickedList();
+      for(int i =0;  i < imagePickedList.length; i++){
+        provider.setimagePickedList(imagePickedList.elementAt(i));
+      }
+    }
 
     return Scaffold(
       body: NestedScrollView(
@@ -123,6 +133,7 @@ class _NewPostState extends State<NewPost> {
                           ),
                           onTap: (){
                             selctImage();
+
                           },
                         ),
                         const SizedBox(width: 6,),
@@ -161,6 +172,7 @@ class _NewPostState extends State<NewPost> {
                                           child: Center(
                                             child: IconButton(onPressed: (){
                                               imagePickedList.removeAt(index);
+                                              provider.removeimagePickedList(imagePickedList.elementAt(index));
                                               setState(() {
 
                                               });
@@ -597,13 +609,83 @@ class _NewPostState extends State<NewPost> {
                       return Column(
                         children: [
                           AppButton(
-                            onTap: (){
+                            onTap: () async{
 
-                            print(infoFormKey.currentState!.validate());
+                            print(infoFormKey.currentState!.validate() == true && provider.isValid);print('cc');
                             if(infoFormKey.currentState!.validate() == true && provider.isValid){
-                              villeController.clear();
-                              returnHome.setEtat(0);
-                              returnHome.setIndex(0);
+
+                              //() async {
+                                {
+                                print('cc2');
+                                print(provider.imagePickedList.length);
+                                List<ImageA> imgP =[];
+                                for(int i = 0; i< provider.imagePickedList.length; i++){
+
+                                  imgP.add(ImageA(
+                                      id: '',
+                                      originalName: provider.imagePickedList.elementAt(i).path,
+                                      type: provider.imagePickedList.elementAt(i).mimeType.toString(),
+                                      url:  provider.imagePickedList.elementAt(i).path,
+                                      updatedAt: '',
+                                      createdAt: ''));
+                                }
+                                  CreatePostRequest payload = CreatePostRequest(
+                                   id: '',
+                                  image: provider.imagePickedList,
+                                  user: '',
+                                  ville: provider.ville,
+                                  quatier: provider.quartier,
+                                  prix: provider.prix,
+                                  nbreDouche: provider.nbrDouches,
+                                  nbreChambre: provider.nbrPersonnes,
+                                  nbrePersonne: provider.nbrPersonnes,
+                                  description: provider.description,
+                                  date: '',
+                                  sanitaire: provider.sanitaire,
+                                  electricite : provider.electricite,
+                                  eau: provider.eau,
+                                  carrele: provider.carreaux,
+                                  status: true,
+                                  deleted: false,
+                                  updatedAt: '',
+                                  createdAt: ''
+                                  );
+
+
+                                  print(payload.toString());
+                                  bool? success =
+                                      await postProvider.createPost(payload);
+                                print(success);
+
+                                  if (success == true) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Post créé avec succès',
+                                          style: AppTypography().authText.copyWith(
+                                              color: AppColors.white
+                                          ),
+                                        ),
+                                        backgroundColor: Colors.green.shade300,
+                                      ),
+                                    );
+                                    villeController.clear();
+                                    returnHome.setEtat(0);
+                                    returnHome.setIndex(0);
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          postController.errorMessage,
+                                          style: AppTypography().authText,
+                                        ),
+                                        backgroundColor: Colors.red.shade300,
+                                      ),
+                                    );
+                                  }
+
+                              };
+
                               }
                             },
 

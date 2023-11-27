@@ -39,7 +39,7 @@ class _DetatlPostState extends State<DetatlPost> {
       bottomNavigationBar: Container(
         padding: EdgeInsets.symmetric(vertical: 12, horizontal: 14),
         child: AppButton(onTap: (){
-
+          context.push('${AppPage.chatRoom.toPath}/$username');
         },
           text: 'ça m\'interresse',
           textColor: AppColors.white,
@@ -122,7 +122,7 @@ class _DetatlPostState extends State<DetatlPost> {
                                     style: AppTypography().title,
                                   ),
                                 ),
-                                Text('${element?.createdAt}',
+                                Text('${element?.createdAt.substring(0,10)}',
                                   style: AppTypography().subtitle,
                                 ),
 

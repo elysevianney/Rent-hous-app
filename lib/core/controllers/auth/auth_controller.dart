@@ -51,6 +51,7 @@ class AuthController extends ChangeNotifier {
 
       if (res != null) {
         await StorageService().saveUserToken(res.token);
+        await StorageService().saveUserId(res.id);
         _session = Session(accessToken: res.token);
         success = true;
       }
@@ -72,6 +73,7 @@ class AuthController extends ChangeNotifier {
     bool success = false;
 
     try {
+
       success = await _authService.register(payload);
       return success;
     } catch (e) {

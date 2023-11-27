@@ -2,6 +2,20 @@ import 'package:location_app/export.dart';
 
 class PostValidator extends ChangeNotifier {
   List<XFile> imagePickedList = [];
+  setimagePickedList(XFile file){
+    this.imagePickedList.add(file) ;
+    print(imagePickedList.length);
+    notifyListeners();
+  }
+  setzeroPickedList(){
+    this.imagePickedList = [] ;
+    print(imagePickedList.length);
+    notifyListeners();
+  }
+  removeimagePickedList(XFile file){
+    //this.imagePickedList.remove(file) ;
+    notifyListeners();
+  }
   String ville  = '';
   String quartier = '';
   int nbrPersonnes =  0;
@@ -105,27 +119,29 @@ class PostValidator extends ChangeNotifier {
   }
 
   setPrix(String prix){
-    this.prix = prix as int;
+    this.prix = int.parse(prix);
+    print(prix);
     notifyListeners();
   }
 
   setDescription(String description){
     this.description = description;
+    print(description);
     notifyListeners();
   }
 
   setNbrPersonnes(String nbrPersonnes){
-    this.nbrPersonnes = nbrPersonnes as int;
+    this.nbrPersonnes = int.parse(nbrPersonnes) ;
     notifyListeners();
   }
 
   setNbrChambres(String nbrChambres){
-    this.nbrChambres = nbrChambres as int;
+    this.nbrChambres = int.parse(nbrChambres);
     notifyListeners();
   }
 
   setNbrDouche(String nbrDouches){
-    this.nbrDouches = nbrDouches as int;
+    this.nbrDouches = int.parse(nbrDouches);
     notifyListeners();
   }
 
@@ -156,10 +172,11 @@ class PostValidator extends ChangeNotifier {
 
 
   bool get isValid {
-    if (ville.isNotEmpty && quartier.isNotEmpty && nbrPersonnes.isNaN
-        && nbrChambres.isNaN && nbrDouches.isNaN && prix.isNaN
+
+    if (ville.isNotEmpty && quartier.isNotEmpty && nbrPersonnes != null
+        && nbrChambres != null && nbrDouches != null && prix != null
         && description.isNotEmpty) {
-      print("all champs valid");
+      print("$ville $quartier $nbrPersonnes $nbrChambres $nbrDouches $prix $description");
       return true;
     } else {
       return false;

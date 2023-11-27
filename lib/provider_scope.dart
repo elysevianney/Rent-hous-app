@@ -1,3 +1,4 @@
+import 'package:location_app/core/controllers/auth/chat_controller.dart';
 import 'package:location_app/core/provider/bottomNavigation/navigator_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:location_app/core/provider/validator/create_post_provider.dart';
@@ -24,6 +25,7 @@ class ProviderScope extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<PostController>(create: (_) => PostController()),
+        ChangeNotifierProvider<ChatDataController>(create: (_) => ChatDataController()),
         ChangeNotifierProvider<PostValidator>(create: (_) => PostValidator()),
         ChangeNotifierProvider<FavorsProvider>(create: (_) => FavorsProvider(0)),
         ChangeNotifierProvider<DashboardProvider>(create: (_) => DashboardProvider()),

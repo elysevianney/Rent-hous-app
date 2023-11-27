@@ -1,3 +1,5 @@
+import 'package:location_app/core/controllers/auth/chat_controller.dart';
+import 'package:location_app/core/models/chat.dart';
 import 'package:location_app/export.dart';
 
 import '../../../core/provider/bottomNavigation/navigator_provider.dart';
@@ -48,6 +50,7 @@ class _MyChatState extends State<MyChat> {
   @override
   Widget build(BuildContext context) {
     DashboardProvider returnHome = Provider.of<DashboardProvider>(context);
+    ChatDataController chat_controller = Provider.of<ChatDataController>(context);
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: AppColors.white,
@@ -170,11 +173,51 @@ class _MyChatState extends State<MyChat> {
                         ],
                       ),
                       const SizedBox(height: 12,),
+                      FutureBuilder<List<Chat>?>(
+                        future: chat_controller.getChat(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<List<Chat>?> snapshot) {
+                          print(chat_controller.getChat());
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else if (!snapshot.hasData || snapshot.data == null) {
+                            return const Text('Aucun pack disponible');
+                          } else {
+
+                            return ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              addRepaintBoundaries: false,
+                              itemCount: snapshot.data?.length,
+                              itemBuilder: (context, index) {
+                                List<String> imgP = [];
+                                for(int i = 0; i< snapshot.data!.elementAt(index).image.length; i++){
+
+                                  imgP.add(snapshot.data!.elementAt(index).image.elementAt(i).url);
+                                }
+                                Chat element = snapshot.data!.elementAt(index);
+                                return MessageView(
+                                  userProfil: $AppAssets.imgs.profil,
+                                  senderUsername: 'elt1',
+                                  lastMessage: 'Salut je suis interrssé',
+                                  userID: '2',)
+                                ;
+                              },
+                            );
+                          }
+                        },
+                      ),
+                      /*
                       MessageView(userProfil: $AppAssets.imgs.profil, senderUsername: 'Anaelle', lastMessage: 'Salut je suis interrssé', userID: '2',),
                       MessageView(userProfil: $AppAssets.imgs.profil, senderUsername: 'Eliot', lastMessage: 'Salut je suis interrssé', userID: '3',),
                       MessageView(userProfil: $AppAssets.imgs.profil, senderUsername: 'Kate', lastMessage: 'Salut je suis interrssé', userID: '4',),
                       MessageView(userProfil: $AppAssets.imgs.profil, senderUsername: 'Hanane', lastMessage: 'Salut je suis interrssé', userID: '5',),
                       MessageView(userProfil: $AppAssets.imgs.profil, senderUsername: 'Junior', lastMessage: 'Salut je suis interrssé', userID: '6',),
+                      */
                       ],
                   ),
                 ],
@@ -241,14 +284,17 @@ class MessageView extends StatelessWidget {
                         children: [
                           Text(lastMessage,
                             style: AppTypography().title.copyWith(fontWeight: FontWeight.w400),),
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                                color: AppColors.red
+                          Visibility(
+                            visible: false,
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                  color: AppColors.red
+                              ),
+                              child: Text('1',
+                                style: AppTypography().subtitle.copyWith(color: AppColors.white, fontSize: 8),),
                             ),
-                            child: Text('1',
-                              style: AppTypography().subtitle.copyWith(color: AppColors.white, fontSize: 8),),
                           ),
                         ],
                       )

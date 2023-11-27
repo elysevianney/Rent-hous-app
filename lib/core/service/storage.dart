@@ -25,6 +25,12 @@ class StorageService {
     return pref.getString('userToken');
 
   }
+  Future<String?> getUserId() async {
+    final pref = await SharedPreferences.getInstance();
+
+    return pref.getString('userId');
+
+  }
 
   Future<void> saveConnectedUser(User? user) async {
     final pref = await SharedPreferences.getInstance();
@@ -36,6 +42,12 @@ class StorageService {
     final pref = await SharedPreferences.getInstance();
 
     await pref.setString('userToken', token!);
+  }
+
+  Future<void> saveUserId(String? id) async {
+    final pref = await SharedPreferences.getInstance();
+
+    await pref.setString('userId', id!);
   }
 
 

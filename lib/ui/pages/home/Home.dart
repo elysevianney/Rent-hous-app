@@ -1,11 +1,13 @@
-import 'dart:async';
-
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:location_app/core/controllers/auth/chat_controller.dart';
 
 import 'package:location_app/core/controllers/auth/post_controller.dart';
 import 'package:location_app/export.dart';
 
 import '../../../core/models/post.dart';
 import '../../../core/provider/bottomNavigation/navigator_provider.dart';
+
+List<Annonce> myannonce = [];
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -24,8 +26,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     DashboardProvider returnHome = Provider.of<DashboardProvider>(context);
     final post_controller = Provider.of<PostController>(context);
-
-
+    final chatController = Provider.of<ChatDataController>(context);
 
     return Scaffold(
       key: _key,
@@ -65,22 +66,14 @@ class _HomeState extends State<Home> {
           ] ;
         },
         body:
-        ListView(
+        Column(
           children: [
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text('Découvrez les meilleurs\nappartements selon vos critères',
-                    softWrap: true,
-                    style: AppTypography().welcome2,
-                  ),
-                ),
-                const SizedBox(height: 20,),
-                FutureBuilder<List<Annonce>?>(
+            Expanded(
+              child: Container(
+                child: FutureBuilder<Iterable<Annonce>?>(
                   future: post_controller.getAnnonce(),
                   builder: (BuildContext context,
-                      AsyncSnapshot<List<Annonce>?> snapshot) {
+                      AsyncSnapshot<Iterable<Annonce>?> snapshot) {
                     print(post_controller.getAnnonce());
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
@@ -94,7 +87,8 @@ class _HomeState extends State<Home> {
 
                       return ListView.builder(
                         scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
+                        shrinkWrap: false,
+                        addRepaintBoundaries: false,
                         itemCount: snapshot.data?.length,
                         itemBuilder: (context, index) {
                           List<String> imgP = [];
@@ -103,28 +97,61 @@ class _HomeState extends State<Home> {
                             imgP.add(snapshot.data!.elementAt(index).image.elementAt(i).url);
                           }
                           Annonce element = snapshot.data!.elementAt(index);
-                          return Annoncesss(
-                              id: element.id,
-                              username: '${snapshot.data!.elementAt(index).user.firstName} ${snapshot.data!.elementAt(0).user.lastName}',
-                              imagePath: imgP,
-                              price: element.prix, ville: element.ville,
-                              quartier: element.quatier,
-                              nbChambre: element.nbreChambre,
-                              nbPersonne: element.nbrePersonne,
-                              nbDouche: element.nbreDouche,
-                              userProfilPath: $AppAssets.imgs.profil,
+                          myannonce.add(element);
+                          return Column(
+                            children: [
+                              index == 0 ?
+                          Column(
+                            children: [
+                              Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Text('Découvrez les meilleurs\nappartements selon vos critères',
+                              softWrap: true,
+                              style: AppTypography().welcome2,
+                              ),
+                              ),
+                              const SizedBox(height: 20,),
 
+                              Annoncesss(
+                                date: element.createdAt.substring(1,10),
+                                id: element.id,
+                                username: '${snapshot.data!.elementAt(index).user.firstName} ${snapshot.data!.elementAt(0).user.lastName}',
+                                imagePath: imgP,
+                                price: element.prix, ville: element.ville,
+                                quartier: element.quatier,
+                                nbChambre: element.nbreChambre,
+                                nbPersonne: element.nbrePersonne,
+                                nbDouche: element.nbreDouche,
+                                userProfilPath: $AppAssets.imgs.profil,
+
+                              ),
+                            ],
+                          )
+                                  :
+                              Annoncesss(
+                                date: element.createdAt.substring(0,10),
+                                  id: element.id,
+                                  username: '${snapshot.data!.elementAt(index).user.firstName} ${snapshot.data!.elementAt(0).user.lastName}',
+                                  imagePath: imgP,
+                                  price: element.prix, ville: element.ville,
+                                  quartier: element.quatier,
+                                  nbChambre: element.nbreChambre,
+                                  nbPersonne: element.nbrePersonne,
+                                  nbDouche: element.nbreDouche,
+                                  userProfilPath: $AppAssets.imgs.profil,
+
+                              ),
+                            ],
                           );
                         },
                       );
                     }
                   },
                 ),
+              ),
+            ),
 
 
-
-              ],
-            )
 
           ],
         )
@@ -161,7 +188,9 @@ class _HomeState extends State<Home> {
 }
 
 class Annoncesss extends StatelessWidget {
+
   final String id;
+  final String date;
   final String username;
   final String userProfilPath;
   final List<String> imagePath;
@@ -172,11 +201,13 @@ class Annoncesss extends StatelessWidget {
   final int nbPersonne;
   final int nbDouche;
   const Annoncesss({
-    super.key, required this.id, required this.username, required this.imagePath, required this.price, required this.ville, required this.quartier, required this.nbChambre, required this.nbPersonne, required this.nbDouche, required this.userProfilPath,
+    super.key, required this.id, required this.username, required this.imagePath, required this.price, required this.ville, required this.quartier, required this.nbChambre, required this.nbPersonne, required this.nbDouche, required this.userProfilPath, required this.date,
   });
 
   @override
   Widget build(BuildContext context) {
+    final chatController = Provider.of<ChatDataController>(context) ;
+    DashboardProvider returnHome = Provider.of<DashboardProvider>(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -207,7 +238,7 @@ class Annoncesss extends StatelessWidget {
                           style: AppTypography().title,
                         ),
                       ),
-                      Text('2h',
+                      Text(date,
                         style: AppTypography().subtitle,
                       ),
 
@@ -262,15 +293,76 @@ class Annoncesss extends StatelessWidget {
                         color: AppColors.primaryTwo
                     ),),
                   ),
-                  AppButton(onTap: () {
+                  AppButton(
+                    onTap: () async{
+                      context.push('${AppPage.chatRoom.toPath}/$username');
+                      /*
+                        print('bouton cliqué');
+                        CreateChatRequest payload = CreateChatRequest(
+                              id: '',
+                              image: [],
+                              user: '',
+                              ville: '',
+                              quatier: '',
+                              prix: 0,
+                              nbreDouche: 0,
+                              nbreChambre: 0,
+                              nbrePersonne: 0,
+                              description: '0',
+                              date: '',
+                              sanitaire: true,
+                              electricite : true,
+                              eau: true,
+                              carrele: true,
+                              status: true,
+                              deleted: false,
+                              updatedAt: '',
+                              createdAt: ''
+                          );
+                          print(payload.toString());
+                          bool? success =
+                          await chatController.createChat(payload);
+                          print(success);
+                          if (success == true) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Discussion créé avec succès',
+                                  style: AppTypography().authText.copyWith(
+                                      color: AppColors.white
+                                  ),
+                                ),
+                                backgroundColor: Colors.green.shade300,
+                              ),
+                            );
 
-                  },
+                            returnHome.setEtat(2);
+                            returnHome.setIndex(2);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  chatController.errorMessage,
+                                  style: AppTypography().authText,
+                                ),
+                                backgroundColor: Colors.red.shade300,
+                              ),
+                            );
+                          }*/
+
+                        },
                     width: 90,
                     height: 35,
                     backgroundColor: AppColors.primaryTwo,
-                    widget: Text('S\'interresser', style: AppTypography().regularAg12.copyWith(
+                    widget: chatController.requestLoading
+                        ? const CircularProgressIndicator(
+                      strokeWidth: 3,
+                      color: Colors.white,
+                    )
+                        : Text('S\'interresser', style: AppTypography().regularAg12.copyWith(
                         color: AppColors.white
                     ),),
+
                   ),
                 ],
               ),
@@ -323,9 +415,10 @@ class MySearchDelegate extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     // TODO: implement buildSuggestions
-    List<Annoncesss> searchResults = [
+    /*List<Annoncesss> searchResults = [
 
       Annoncesss(username: 'Audrey LALI',
+          date: '',
           imagePath: [$AppAssets.imgs.appart2_1,
             $AppAssets.imgs.appart2_2,
             $AppAssets.imgs.appart2_3,],
@@ -333,6 +426,7 @@ class MySearchDelegate extends SearchDelegate {
 
       ),
       Annoncesss(username: 'Anaelle',
+        date: '',
           imagePath: [$AppAssets.imgs.appart3_1,
             $AppAssets.imgs.appart3_2,
             $AppAssets.imgs.appart3_3,],
@@ -340,6 +434,7 @@ class MySearchDelegate extends SearchDelegate {
 
       ),
       Annoncesss(username: 'Vianney AHM',
+        date: '',
         imagePath: [$AppAssets.imgs.appart1_1,
           $AppAssets.imgs.appart1_2,
           $AppAssets.imgs.appart1_3,],
@@ -348,6 +443,7 @@ class MySearchDelegate extends SearchDelegate {
 
       ),
       Annoncesss(username: 'Celsia',
+        date: '',
           imagePath: [$AppAssets.imgs.maison,
             $AppAssets.imgs.maison,
             $AppAssets.imgs.maison,],
@@ -355,13 +451,27 @@ class MySearchDelegate extends SearchDelegate {
 
       ),
       Annoncesss(username: 'Fridaous H',
+        date: '',
           imagePath: [$AppAssets.imgs.maison,
             $AppAssets.imgs.maison,
             $AppAssets.imgs.maison,],
           price: 8500, ville: 'Cotonou', quartier: 'Agla', nbChambre: 1, nbPersonne: 4, nbDouche: 1, userProfilPath: $AppAssets.imgs.profil, id: '5',
 
       ),
-    ];
+    ];*/
+    List<Annoncesss> searchResults = [];
+    for(var element in myannonce){
+      searchResults.add(Annoncesss(id: element.id,
+          username: element.user.lastName,
+          imagePath: [$AppAssets.imgs.appart1_1,
+            $AppAssets.imgs.appart1_2,
+            $AppAssets.imgs.appart1_3,],
+          price: element.prix,
+          ville: element.ville,
+          quartier: element.quatier,
+          nbChambre: element.nbreChambre, nbPersonne: element.nbrePersonne, nbDouche: element.nbreDouche,
+          userProfilPath: $AppAssets.imgs.profil, date: element.date.toString().substring(0,9)));
+    }
     List<Annoncesss> suggestions = searchResults.where((searchResult) {
       final result = searchResult.ville.toLowerCase() + searchResult.quartier.toLowerCase();
       final input = query.toLowerCase();
@@ -376,8 +486,9 @@ class MySearchDelegate extends SearchDelegate {
 
             InkWell(
               onTap: (){
-                var username = suggestion.username;
+                var username = suggestion.id;
                 context.push('${AppPage.detailPost.toPath}/$username');
+                //context.push('${AppPage.detailPost.toPath}/$username');
                 /*query = suggestion;
                 showResults(context);*/
               },
@@ -471,7 +582,7 @@ class _ImageSliderState extends State<ImageSlider> {
   final List<String> imagesPath ;
 
   _ImageSliderState(this.prix, this.imagesPath);
-  final List<NetworkImage> _pages = [
+  final List<CachedNetworkImageProvider> _pages = [
   ];
 
 
@@ -481,7 +592,7 @@ class _ImageSliderState extends State<ImageSlider> {
   void initState() {
     for(int i = 0; i < imagesPath.length; i++){
       _pages.add(
-          NetworkImage(imagesPath.elementAt(i))
+          CachedNetworkImageProvider( imagesPath.elementAt(i),)
       );
     }
 
@@ -597,6 +708,7 @@ List<Annoncesss> allAnnonces = [
 
 
   Annoncesss(username: 'Audrey LALI',
+    date: '',
     imagePath: [$AppAssets.imgs.appart2_1,
       $AppAssets.imgs.appart2_2,
       $AppAssets.imgs.appart2_3,],
@@ -604,6 +716,7 @@ List<Annoncesss> allAnnonces = [
 
   ),
   Annoncesss(username: 'Anaelle',
+    date: '',
       imagePath: [$AppAssets.imgs.appart3_1,
       $AppAssets.imgs.appart3_2,
       $AppAssets.imgs.appart3_3,],
@@ -611,6 +724,7 @@ List<Annoncesss> allAnnonces = [
 
   ),
   Annoncesss(username: 'Vianney AHM',
+    date: '',
     imagePath: [$AppAssets.imgs.appart1_1,
       $AppAssets.imgs.appart1_2,
       $AppAssets.imgs.appart1_3,],
@@ -619,6 +733,7 @@ List<Annoncesss> allAnnonces = [
 
   ),
   Annoncesss(username: 'Celsia',
+    date: '',
     imagePath: [$AppAssets.imgs.maison,
       $AppAssets.imgs.maison,
       $AppAssets.imgs.maison,],
@@ -626,6 +741,7 @@ List<Annoncesss> allAnnonces = [
 
   ),
   Annoncesss(username: 'Fridaous H',
+    date: '',
     imagePath: [$AppAssets.imgs.maison,
       $AppAssets.imgs.maison,
       $AppAssets.imgs.maison,],

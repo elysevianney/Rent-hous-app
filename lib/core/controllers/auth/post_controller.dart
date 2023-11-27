@@ -3,6 +3,7 @@ import 'package:location_app/core/service/api/annonce/annonce_service.dart';
 
 import '../../../export.dart';
 
+import '../../models/payloads/createPost_request.dart';
 import '../../models/payloads/register_request.dart';
 import '../../models/session.dart';
 import '../../models/user.dart';
@@ -10,6 +11,8 @@ import '../../service/api/auth/auth_service.dart';
 import '../../service/storage.dart';
 class PostController extends ChangeNotifier {
   final AuthService _authService = AuthService();
+
+
 
   bool _requestLoading = false;
   bool _hasError = false;
@@ -41,10 +44,10 @@ class PostController extends ChangeNotifier {
   List<Annonce>? _allAnnonces;
   List<Annonce>? get allAnnonceService => _allAnnonces;
 
-  Future<List<Annonce>?> getAnnonce() async {
+  Future<Iterable<Annonce>?> getAnnonce() async {
     _allAnnonces = await _annonceService.getAnnonce();
     if (_allAnnonces != null) {
-      return _allAnnonces;
+      return _allAnnonces?.reversed;
     } else {
       return null;
     }
@@ -59,12 +62,14 @@ class PostController extends ChangeNotifier {
   }
 
 
-  Future<bool> createPost() async {
+  Future<bool?> createPost(CreatePostRequest payload) async {
     requestLoading = true;
-    bool success = false;
+    bool? success;
 
     try {
 
+      success = await _annonceService.createAnnonce(payload);
+      print('yes controller');
       return success;
     } catch (e) {
       hasError = true;
